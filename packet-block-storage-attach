@@ -273,8 +273,16 @@ mpresult=`multipath -ll`
 for (( volume=0; volume<$volumecnt; volume++ )); do
 	volname=`jq '.volumes['$volume'].name ' $LOCALMD | sed 's/"//g'`
 	if [ -b /dev/mapper/$volname ]; then
+		parted /dev/mapper/$volname mklabel msdos
+		parted -a optimal /dev/mapper/$volname mkpart primary 0% 100%
+		kpartx -u  /dev/mapper/$volname-part1
+		mkfs -t ext3 /dev/mapper/$volname-part1
+		mkdir -p /mnt/$volname-part1
+		mount /dev/mapper/$volname-part1 /mnt/$volname-part1/
 		echo "Block device /dev/mapper/$volname is available for use"
+		echo "/mnt/$volname-part1"
 	else
 		echo "Error: Block device /dev/mapper/$volname is NOT available for use"
 	fi
 done
+exit 0

@@ -59,6 +59,8 @@ if [ `ls /dev/mapper/mpath* >/dev/null 2>/dev/null` ]; then
 	done
 fi
 
+for x in `ls /mnt/ | grep "volume" $1`; do sudo umount /mnt/$x; done
+
 for (( idx=0; idx<$volumecnt; idx++ )); do
 	volname=`jq '.volumes['$idx'].name ' $LOCALMD | sed 's/"//g'`
 	if [ "$target" ] ; then
@@ -80,3 +82,5 @@ done
 #ubuntu
 #rm -rf /etc/iscsi/send_targets/*
 #rm -rf /etc/iscsi/nodes/*
+
+exit 0
